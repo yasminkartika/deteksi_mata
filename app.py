@@ -5,7 +5,7 @@ from PIL import Image
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 
 # Load model yang sudah dilatih
-model = tf.keras.models.load_model('model_mata_128x128.h5')
+model = tf.keras.models.load_model('model_mata.h5')
 
 # Daftar kelas penyakit mata
 class_names = ['Cataract', 'Diabetic Retinopathy', 'Glaucoma', 'Normal']
