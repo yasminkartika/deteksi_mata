@@ -37,6 +37,7 @@ if uploaded_file and detect_button:
     img_array = np.array(img_resized) / 255.0
     img_batch = np.expand_dims(img_array, axis=0)
 
+    # Prediction
     prediction = model.predict(img_batch)
     predicted_class = CLASS_NAMES[np.argmax(prediction)]
     confidence = np.max(prediction) * 100
@@ -45,7 +46,7 @@ if uploaded_file and detect_button:
     st.image(image, caption="Gambar yang Diperiksa", width=300)
 
     st.markdown("### Hasil Deteksi")
-    st.markdown("Kemungkinan:")
+    st.markdown("Kemungkinan: ")
     st.markdown(f"**<span style='font-size: 26px;'>{predicted_class}</span>**", unsafe_allow_html=True)
     st.markdown(f"<span style='font-size: 32px; color: red; font-weight: bold;'>{confidence:.0f}%</span>", unsafe_allow_html=True)
 
