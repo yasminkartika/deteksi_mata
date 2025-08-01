@@ -13,11 +13,12 @@ st.set_page_config(page_title="Deteksi Penyakit Mata", layout="centered")
 # === Load Model ===
 @st.cache_resource
 def load_model():
-    return tf.keras.models.load_model('eye_disease_classification_model.h5', compile=False)
+    model = tf.keras.models.load_model('eye_disease_classification_model.h5', compile=False)
+    return model
 
 model = load_model()
 
-# === App UI ===
+# === UI: Upload ===
 st.markdown("## Unggah Gambar Citra  Mata")
 col1, col2 = st.columns(2)
 
@@ -29,10 +30,8 @@ with col2:
     if uploaded_file:
         image = Image.open(uploaded_file).convert('RGB')
         st.image(image, use_column_width=True)
-    else:
-        st.empty()
 
-# === Hasil Deteksi ===
+# === Deteksi ===
 if uploaded_file and detect_button:
     img_resized = image.resize(IMG_SIZE)
     img_array = np.array(img_resized) / 255.0
