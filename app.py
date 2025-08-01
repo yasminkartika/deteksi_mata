@@ -13,7 +13,7 @@ st.set_page_config(page_title="Deteksi Penyakit Mata", layout="centered")
 # === Load Model ===
 @st.cache_resource
 def load_model():
-    return tf.keras.models.load_model('eye_disease_model.keras', compile=False)
+    return tf.keras.models.load_model('eye_disease_classification_model.h5', compile=False)
 
 model = load_model()
 
