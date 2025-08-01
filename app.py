@@ -3,6 +3,7 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 import datetime
+import os
 
 # === Setup ===
 IMG_SIZE = (128, 128)
@@ -61,9 +62,15 @@ if uploaded_file and detect_button:
     colA, colB = st.columns([1, 1])
     with colA:
         if st.button("💾 Simpan Hasil"):
-            with open("riwayat_deteksi.txt", "a") as f:
+            # Membuat direktori jika tidak ada
+            if not os.path.exists("riwayat_deteksi"):
+                os.makedirs("riwayat_deteksi")
+            
+            # Menyimpan hasil ke dalam file .txt
+            file_path = os.path.join("riwayat_deteksi", "riwayat_deteksi.txt")
+            with open(file_path, "a") as f:
                 f.write(f"{datetime.datetime.now()}: {predicted_class} ({confidence:.2f}%)\n")
-            st.success("Hasil berhasil disimpan!")
+            st.success(f"Hasil berhasil disimpan di {file_path}!")
 
     with colB:
         if st.button("🔁 Deteksi Ulang"):
