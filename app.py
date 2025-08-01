@@ -20,13 +20,6 @@ model = load_model()
 
 # === UI: Upload ===
 st.markdown("## Unggah Gambar Citra Mata", unsafe_allow_html=True)
-st.markdown("""
-    <style>
-    .center-text {
-        text-align: center;
-    }
-    </style>
-""", unsafe_allow_html=True)
 
 col1, col2 = st.columns([1, 1])
 
@@ -41,22 +34,28 @@ with col2:
 
 # === Deteksi ===
 if uploaded_file and detect_button:
-    img_resized = image.resize(IMG_SIZE)
-    img_array = np.array(img_resized) / 255.0
-    img_batch = np.expand_dims(img_array, axis=0)
+    with st.spinner('Memproses gambar...'):
+        img_resized = image.resize(IMG_SIZE)
+        img_array = np.array(img_resized) / 255.0
+        img_batch = np.expand_dims(img_array, axis=0)
 
-    # Prediction
-    prediction = model.predict(img_batch)
-    predicted_class = CLASS_NAMES[np.argmax(prediction)]
-    confidence = np.max(prediction) * 100
+        # Prediction
+        prediction = model.predict(img_batch)
+        predicted_class = CLASS_NAMES[np.argmax(prediction)]
+        confidence = np.max(prediction) * 100
 
+    # Scroll otomatis ke hasil
     st.markdown("---")
-    st.image(image, caption="Gambar yang Diperiksa", width=300)
+    col1, col2 = st.columns([1, 1])
 
-    st.markdown("### Hasil Deteksi", unsafe_allow_html=True)
-    st.markdown("Kemungkinan: ")
-    st.markdown(f"**<span style='font-size: 26px;'>{predicted_class}</span>**", unsafe_allow_html=True)
-    st.markdown(f"<span style='font-size: 32px; color: red; font-weight: bold;'>{confidence:.0f}%</span>", unsafe_allow_html=True)
+    with col1:
+        st.image(image, caption="Gambar yang Diperiksa", width=300)
+
+    with col2:
+        st.markdown("### Hasil Deteksi")
+        st.markdown("Kemungkinan: ")
+        st.markdown(f"**<span style='font-size: 26px;'>{predicted_class}</span>**", unsafe_allow_html=True)
+        st.markdown(f"<span style='font-size: 32px; color: red; font-weight: bold;'>{confidence:.0f}%</span>", unsafe_allow_html=True)
 
     # Tombol simpan hasil dan deteksi ulang
     colA, colB = st.columns([1, 1])
