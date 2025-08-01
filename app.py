@@ -19,8 +19,16 @@ def load_model():
 model = load_model()
 
 # === UI: Upload ===
-st.markdown("## Unggah Gambar Citra  Mata")
-col1, col2 = st.columns(2)
+st.markdown("## Unggah Gambar Citra Mata", unsafe_allow_html=True)
+st.markdown("""
+    <style>
+    .center-text {
+        text-align: center;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+col1, col2 = st.columns([1, 1])
 
 with col1:
     uploaded_file = st.file_uploader("Unggah Gambar", type=["jpg", "jpeg", "png"], label_visibility="collapsed")
@@ -29,7 +37,7 @@ with col1:
 with col2:
     if uploaded_file:
         image = Image.open(uploaded_file).convert('RGB')
-        st.image(image, use_column_width=True)
+        st.image(image, use_container_width=True)
 
 # === Deteksi ===
 if uploaded_file and detect_button:
@@ -45,13 +53,13 @@ if uploaded_file and detect_button:
     st.markdown("---")
     st.image(image, caption="Gambar yang Diperiksa", width=300)
 
-    st.markdown("### Hasil Deteksi")
+    st.markdown("### Hasil Deteksi", unsafe_allow_html=True)
     st.markdown("Kemungkinan: ")
     st.markdown(f"**<span style='font-size: 26px;'>{predicted_class}</span>**", unsafe_allow_html=True)
     st.markdown(f"<span style='font-size: 32px; color: red; font-weight: bold;'>{confidence:.0f}%</span>", unsafe_allow_html=True)
 
     # Tombol simpan hasil dan deteksi ulang
-    colA, colB = st.columns(2)
+    colA, colB = st.columns([1, 1])
     with colA:
         if st.button("💾 Simpan Hasil"):
             with open("riwayat_deteksi.txt", "a") as f:
