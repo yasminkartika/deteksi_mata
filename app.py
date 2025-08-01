@@ -2,48 +2,62 @@ import streamlit as st
 import tensorflow as tf
 import numpy as np
 from PIL import Image
-from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
+import datetime
 
-# Load model yang sudah dilatih
-model = tf.keras.models.load_model('eye_disease_model.keras')
+# === Setup ===
+IMG_SIZE = (128, 128)
+CLASS_NAMES = ['Cataract', 'Diabetic Retinopathy', 'Glaucoma', 'Normal']
 
+st.set_page_config(page_title="Deteksi Penyakit Mata", layout="centered")
 
-# Daftar kelas penyakit mata
-class_names = ['Cataract', 'Diabetic Retinopathy', 'Glaucoma', 'Normal']
+# === Load Model ===
+@st.cache_resource
+def load_model():
+    return tf.keras.models.load_model('eye_disease_model.keras', compile=False)
 
-# Fungsi preprocessing gambar
-def preprocess_image(image):
-    image = image.resize((224, 224))  # Sesuaikan ukuran input model
-    img_array = tf.keras.preprocessing.image.img_to_array(image)
-    img_array = tf.expand_dims(img_array, 0)
-    img_array = preprocess_input(img_array)
-    return img_array
+model = load_model()
 
-# Tampilan UI
-st.markdown("<h3 style='text-align: center;'>Unggah Gambar Citra Mata</h3>", unsafe_allow_html=True)
-
+# === App UI ===
+st.markdown("## Unggah Gambar Citra  Mata")
 col1, col2 = st.columns(2)
 
 with col1:
-    uploaded_file = st.file_uploader("Unggah Gambar", type=["jpg", "jpeg", "png"])
-    if uploaded_file:
-        image = Image.open(uploaded_file)
-        st.image(image, caption="Gambar Citra Fundus", use_column_width=True)
+    uploaded_file = st.file_uploader("Unggah Gambar", type=["jpg", "jpeg", "png"], label_visibility="collapsed")
+    detect_button = st.button("🔍 Deteksi Sekarang", use_container_width=True)
 
 with col2:
     if uploaded_file:
-        st.write("Pratinjau Gambar Citra Mata")
+        image = Image.open(uploaded_file).convert('RGB')
         st.image(image, use_column_width=True)
-
-st.markdown("<div style='text-align: center; margin-top: 20px;'>", unsafe_allow_html=True)
-if st.button("Deteksi Sekarang"):
-    if uploaded_file is None:
-        st.warning("Silakan unggah gambar terlebih dahulu.")
     else:
-        img = preprocess_image(image)
-        prediction = model.predict(img)
-        predicted_class = class_names[np.argmax(prediction)]
-        confidence = np.max(prediction)
-        st.success(f"🧠 Prediksi: **{predicted_class}**")
-        st.info(f"📈 Tingkat Keyakinan: **{confidence * 100:.2f}%**")
-st.markdown("</div>", unsafe_allow_html=True)
+        st.empty()
+
+# === Hasil Deteksi ===
+if uploaded_file and detect_button:
+    img_resized = image.resize(IMG_SIZE)
+    img_array = np.array(img_resized) / 255.0
+    img_batch = np.expand_dims(img_array, axis=0)
+
+    prediction = model.predict(img_batch)
+    predicted_class = CLASS_NAMES[np.argmax(prediction)]
+    confidence = np.max(prediction) * 100
+
+    st.markdown("---")
+    st.image(image, caption="Gambar yang Diperiksa", width=300)
+
+    st.markdown("### Hasil Deteksi")
+    st.markdown("Kemungkinan:")
+    st.markdown(f"**<span style='font-size: 26px;'>{predicted_class}</span>**", unsafe_allow_html=True)
+    st.markdown(f"<span style='font-size: 32px; color: red; font-weight: bold;'>{confidence:.0f}%</span>", unsafe_allow_html=True)
+
+    # Tombol simpan hasil dan deteksi ulang
+    colA, colB = st.columns(2)
+    with colA:
+        if st.button("💾 Simpan Hasil"):
+            with open("riwayat_deteksi.txt", "a") as f:
+                f.write(f"{datetime.datetime.now()}: {predicted_class} ({confidence:.2f}%)\n")
+            st.success("Hasil berhasil disimpan!")
+
+    with colB:
+        if st.button("🔁 Deteksi Ulang"):
+            st.experimental_rerun()
