@@ -7,6 +7,7 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 # Load model yang sudah dilatih
 model = tf.keras.models.load_model('eye_disease_classification_model.h5')
 
+
 # Daftar kelas penyakit mata
 class_names = ['Cataract', 'Diabetic Retinopathy', 'Glaucoma', 'Normal']
 
