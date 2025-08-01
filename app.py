@@ -5,7 +5,7 @@ from PIL import Image
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 
 # Load model yang sudah dilatih
-model = tf.keras.models.load_model('eye_disease_classification_model.h5')
+model = tf.keras.models.load_model('eye_disease_model.keras')
 
 
 # Daftar kelas penyakit mata
